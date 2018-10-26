@@ -308,6 +308,7 @@ open class FPNTextField: UITextField, UITextFieldDelegate, FPNCountryPickerDeleg
 		var allowedCharactersSet = CharacterSet.decimalDigits
 
 		allowedCharactersSet.insert("+")
+		allowedCharactersSet.insert(",")
 
 		return string.components(separatedBy: allowedCharactersSet.inverted).joined(separator: "")
 	}
