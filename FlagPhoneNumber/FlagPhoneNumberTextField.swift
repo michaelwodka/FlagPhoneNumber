@@ -246,11 +246,11 @@ open class FPNTextField: UITextField, UITextFieldDelegate, FPNCountryPickerDeleg
 
 	// Private
 
-	@objc private func didEditText() {
+	/*@objc private func didEditText() {
 		if let phoneCode = selectedCountry?.phoneCode, let number = text {
 			var cleanedPhoneNumber = clean(string: "\(phoneCode) \(number)")
 
-			if let validPhoneNumber = getValidNumber(phoneNumber: cleanedPhoneNumber) {
+			if let validPhoneNumber = getValidNumber(phoneNumber: cleanedPhoneNumber), !cleanedPhoneNumber.contains(",") {
 				nbPhoneNumber = validPhoneNumber
 
 				cleanedPhoneNumber = "+\(validPhoneNumber.countryCode.stringValue)\(validPhoneNumber.nationalNumber.stringValue)"
@@ -270,8 +270,40 @@ open class FPNTextField: UITextField, UITextFieldDelegate, FPNCountryPickerDeleg
 				flagPhoneNumberDelegate?.fpnDidValidatePhoneNumber(textField: self, isValid: false)
 			}
 		}
-	}
-
+	}*/
+    
+    @objc private func didEditText() {
+        if let phoneCode = selectedCountry?.phoneCode, let number = text {
+            var cleanedPhoneNumber = clean(string: "\(phoneCode) \(number)")
+            
+            if let validPhoneNumber = getValidNumber(phoneNumber: cleanedPhoneNumber), !cleanedPhoneNumber.contains(",") {
+                nbPhoneNumber = validPhoneNumber
+                
+                cleanedPhoneNumber = "+\(validPhoneNumber.countryCode.stringValue)\(validPhoneNumber.nationalNumber.stringValue)"
+                
+                if let inputString = formatter?.inputString(cleanedPhoneNumber) {
+                    if selectedCountry!.code.rawValue == "US"{
+                        if inputString.contains(",") == false{
+                            text = remove(dialCode: phoneCode, in: inputString)
+                        }
+                    }
+                }
+                flagPhoneNumberDelegate?.fpnDidValidatePhoneNumber(textField: self, isValid: true)
+            } else {
+                nbPhoneNumber = nil
+                
+                if let dialCode = selectedCountry?.phoneCode {
+                    if let inputString = formatter?.inputString(cleanedPhoneNumber) {
+                        if selectedCountry!.code.rawValue == "US"{
+                            text = remove(dialCode: phoneCode, in: inputString)
+                        }
+                    }
+                }
+                flagPhoneNumberDelegate?.fpnDidValidatePhoneNumber(textField: self, isValid: false)
+            }
+        }
+    }
+    
 	private func convert(format: FPNFormat) -> NBEPhoneNumberFormat {
 		switch format {
 		case .E164:
@@ -308,7 +340,8 @@ open class FPNTextField: UITextField, UITextFieldDelegate, FPNCountryPickerDeleg
 		var allowedCharactersSet = CharacterSet.decimalDigits
 
 		allowedCharactersSet.insert("+")
-		allowedCharactersSet.insert(",")
+        
+        allowedCharactersSet.insert(",")
 
 		return string.components(separatedBy: allowedCharactersSet.inverted).joined(separator: "")
 	}
@@ -327,7 +360,8 @@ open class FPNTextField: UITextField, UITextFieldDelegate, FPNCountryPickerDeleg
 	}
 
 	private func remove(dialCode: String, in phoneNumber: String) -> String {
-		return phoneNumber.replacingOccurrences(of: "\(dialCode) ", with: "").replacingOccurrences(of: "\(dialCode)", with: "")
+		//return phoneNumber.replacingOccurrences(of: "\(dialCode) ", with: "").replacingOccurrences(of: "\(dialCode)", with: "")
+        return phoneNumber.replacingOccurrences(of: "\(dialCode) ", with: "").replacingOccurrences(of: "\(dialCode)", with: "").replacingOccurrences(of: ",", with: ",")
 	}
 
 	private func showSearchController() {
@@ -399,3 +433,4 @@ open class FPNTextField: UITextField, UITextFieldDelegate, FPNCountryPickerDeleg
 		setFlag(for: country.code)
 	}
 }
+
