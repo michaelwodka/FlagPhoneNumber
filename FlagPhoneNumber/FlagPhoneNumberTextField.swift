@@ -325,7 +325,7 @@ open class FPNTextField: UITextField, UITextFieldDelegate, FPNCountryPickerDeleg
 		flagButton.setImage(selectedCountry?.flag, for: .normal)
 
 		if let phoneCode = selectedCountry?.phoneCode {
-			phoneCodeTextField.text = phoneCode
+			phoneCodeTextField.text = phoneCode + " "
 			phoneCodeTextField.sizeToFit()
 			layoutSubviews()
 		}
